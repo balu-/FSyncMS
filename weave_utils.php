@@ -17,11 +17,11 @@
 
     function log_error($msg)
     {   
-        #$datei = fopen("error.txt","a");
-        #fputs($datei,$msg."
-        #");
+#        $datei = fopen("error.txt","a");
+ #       fputs($datei,$msg."
+  #      ");
         #fputs($datei,"Server ".print_r( $_SERVER, true));
-        #fclose($datei);
+   #     fclose($datei);
     }
     
 	function report_problem($message, $code = 503)
@@ -50,14 +50,19 @@
 		else
 			return utf8_encode($string);
 	}
-
+    
+    function get_phpinput()
+    {
+        #stupid php being helpful with input data...
+        $putdata = fopen("php://input", "r");
+        $string = '';
+        while ($data = fread($putdata,2048)) {$string .= $data;} //hier will man ein limit einbauen
+        return $string;
+    }
 	function get_json()
 	{
-		#stupid php being helpful with input data...
-		$putdata = fopen("php://input", "r");
-		$jsonstring = '';
-		while ($data = fread($putdata,2048)) {$jsonstring .= $data;}
-		$json = json_decode(fix_utf8_encoding($jsonstring), true);
+		$jsonstring = get_phpinput();
+        $json = json_decode(fix_utf8_encoding($jsonstring), true);
 
 		if ($json === null)
 			report_problem(WEAVE_ERROR_JSON_PARSE, 400);

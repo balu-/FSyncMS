@@ -1,5 +1,13 @@
 <?php
-
+    /*
+    ## DESCRIPTION: Implementation of user api v1.0 
+    ##
+    ## AUTHOR: balu
+    ##
+    ## DATE: 20.02.2012
+    ## 
+    ## VERSION: 0.1
+    */
     require_once 'weave_utils.php';
     if(!$include) //file should only be used in context of index.php
     {
@@ -21,7 +29,7 @@
 	$path = substr($path, 1); #chop the lead slash
 	list($preinstr,$version, $username, $function, $collection, $id) = explode('/', $path.'///');
     log_error("Pfad:".$path); 
-    if( $preinstr != 'user' && $preinstr!='misc')
+    if( $preinstr != 'user' && $preinstr != 'misc' )
         report_problem('Function not found', 404);
 	
     if ($version != '1.0')
@@ -40,7 +48,7 @@
     header("Content-type: application/json");
     //if ($function != "info" && $function != "storage")
 	//	report_problem(WEAVE_ERROR_FUNCTION_NOT_SUPPORTED, 400);
-    if (!validate_username($username))
+    if (!validate_username($username)) 
 	{
         log_error( "invalid user");
         report_problem(WEAVE_ERROR_INVALID_USERNAME, 400);
@@ -54,6 +62,8 @@
             log_error("user.php: GET");
             if($function == 'node' && $collection == 'weave') //client fragt node an 
             {
+                // reply node server for user
+
                 //to be compatible with users how use /index.php/ in their path
                 /*$index ="https://";
                 if (!isset($_SERVER['HTTPS'])) 
@@ -61,13 +71,22 @@
                 $index .= $_SERVER['SERVER_NAME']. dirname($_SERVER['SCRIPT_NAME']) . "/";
                 if(strpos($_SERVER['REQUEST_URI'],'index.php') !== 0)
                     $index .= "index.php/";
-                //antwort (self)i*/
+                */
                 exit(FSYNCMS_ROOT);
                     
             }
             else if($function == 'password_reset')
             {
                 //email mit neuem pw senden
+                /*
+                Possible errors:
+
+                    503: problems with looking up the user or sending the email
+                    400: 12 (No email address on file)
+                    400: 3 (Incorrect or missing username)
+                    400: 2 (Incorrect or missing captcha)
+                */
+                report_problem(WEAVE_ERROR_NO_EMAIL, 400);
             }
             //node/weave
 		    else if($function == '' && $collection == '' && $id =='') //frage nach freiem usernamen
@@ -102,14 +121,24 @@
             log_error(print_r($data,true));
             //werte vorhanden
             if($data == NULL)
-                report_problem(WEAVE_ERROR_INVALID_PROTOCOL, 400);
+                report_problem(WEAVE_ERROR_JSON_PARSE, 400);
             $name = $username;
             $pwd = fix_utf8_encoding($data['password']);
             $email = $data['email'];
+            if($email == '')
+            {
+                log_error('create user datenfehler');
+                report_problem(WEAVE_ERROR_NO_EMAIL, 400);
+            }
+            else if ( $pwd == '' )
+            {
+                log_error('create user datenfehler');
+                report_problem(WEAVE_ERROR_MISSING_PASSWORD, 400);
+            }
             if($name == '' || $pwd == '' || $email == '')
             {
                 log_error('create user datenfehler');
-                report_problem(WEAVE_ERROR_INVALID_PROTOCOL, 400);
+                report_problem(WEAVE_ERROR_JSON_PARSE, 400);
             }
             log_error("create user ".$name." pw : ".$pwd);
             try{
@@ -121,7 +150,7 @@
                 else
                 {
                     log_error("create user failed");
-                    report_problem('Authentication failed', '401');
+                    report_problem(WEAVE_ERROR_NO_OVERWRITE, 503);
                 }
             }
             catch(Exception $e)
@@ -138,6 +167,40 @@
                 report_problem(WEAVE_ERROR_FUNCTION_NOT_SUPPORTED,400);
             }
         } // ende put
+        else if($_SERVER['REQUEST_METHOD'] == 'POST')
+        {
+            if($username == '')
+            {
+                log_error("user.php : Post no username");
+                report_problem(WEAVE_ERROR_INVALID_USERNAME, 400);
+            }
+            $db = new WeaveStorage($username);
+            log_error("user.php: POST");
+            if($function == "password")
+            {
+                #Auth the user
+                verify_user($username, $db);
+                   $new_pwd = get_phpinput();
+                   log_error("user.php: POST password ");
+                  //to do
+                  // change pw in db
+                  if($db->change_password($username, $new_pwd))
+                    exit("success"); 
+                  else
+                    report_problem(WEAVE_ERROR_INVALID_PROTOCOL, 503); //server db messed up somehow
+                  // return success
+                  // report_problem(7, 400);
+            }
+            else if($function == "email")
+            {
+                //change email adr
+            }
+            else
+            {
+                report_problem(WEAVE_ERROR_INVALID_PROTOCOL, 400);
+            }
+            // exit('success');
+        }
     }
     catch(Exception $e)
     {
