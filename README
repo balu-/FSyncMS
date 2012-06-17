@@ -1,0 +1,11 @@
+Visit http://www.ohnekontur.de/2011/07/24/how-to-install-fsyncms-firefox-sync-eigener-server/ for install instructions
+Visit http://www.ohnekontur.de for the newest version
+
+
+FSyncMS v 08
+
+Should be working with firefox 11 and lower (tested with 11)
+
+Changelog,
+Fixed user registration process,
+fixed some delete problems
