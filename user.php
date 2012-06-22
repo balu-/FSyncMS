@@ -21,13 +21,13 @@
 		$path = $_SERVER['PATH_INFO'];
 	else if (!empty($_SERVER['ORIG_PATH_INFO']))
 		$path = $_SERVER['ORIG_PATH_INFO'];
-	else
+	else 
     {
         log_error("user.php: No path found");
 		report_problem("No path found", 404);
     }
 	$path = substr($path, 1); #chop the lead slash
-	list($preinstr,$version, $username, $function, $collection, $id) = explode('/', $path.'///');
+	list($preinstr, $version, $username, $function, $collection, $id) = explode('/', $path.'///');
     log_error("Pfad:".$path); 
     if( $preinstr != 'user' && $preinstr != 'misc' )
         report_problem('Function not found', 404);

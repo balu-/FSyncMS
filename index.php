@@ -38,6 +38,19 @@
 #
 # ***** END LICENSE BLOCK *****
 
+    if ( ! file_exists("settings.php") && file_exists("setup.php") ) {
+        header( 'Location: setup.php' );
+        exit;
+
+    } else if ( ! file_exists("settings.php") ) {
+        echo "<hr><h2>Maybe the setup is not completed, missing settings.php</h2><hr>"; 
+        exit;
+
+    } else if ( file_exists("setup.php") ) {
+        echo "<hr><h2>Maybe the setup is not completed, else please delete setup.php</h2><hr>"; 
+        exit;
+    }
+
 	require_once 'weave_storage.php';
 	require_once 'weave_basic_object.php';
 	require_once 'weave_utils.php';
@@ -48,7 +61,7 @@
 	$server_time = round(microtime(1), 2);
 	header("X-Weave-Timestamp: " . $server_time);
 
-	#Basic path extraction and validation. No point in going on if these are missing
+	# Basic path extraction and validation. No point in going on if these are missing
 	$path = '/';
 	if (!empty($_SERVER['PATH_INFO']))
 		$path = $_SERVER['PATH_INFO'];
@@ -56,10 +69,12 @@
 		$path = $_SERVER['ORIG_PATH_INFO'];
 	else
 		report_problem("No path found", 404);
-
     
 	$path = substr($path, 1); #chop the lead slash
 	log_error("start request_____" . $path); 
+    // ensure that we got a valid request
+    if ( !$path ) 
+        report_problem("Invalid request, this was not a firefox sync request!", 400);
     list($version, $username, $function, $collection, $id) = explode('/', $path.'///');
     
     if($version == 'user' || $version == 'misc')

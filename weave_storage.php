@@ -45,13 +45,16 @@ class WeaveStorage
     private $_username;
     private $_dbh;
 
-    function __construct($username)
+    function __construct($username) 
     {
+
         $this->_username = $username;
-        $create_tables = false;
-        try
+
+        log_error("Initalizing DB connecion!");
+
+        try 
         {
-            if(!MYSQL_ENABLE)
+            if ( ! MYSQL_ENABLE ) 
             {
                 $path = explode('/', $_SERVER['SCRIPT_FILENAME']);
                 $db_name = 'weave_db';
@@ -59,40 +62,27 @@ class WeaveStorage
                 array_push($path, $db_name);
                 $db_name = implode('/', $path);
 
-                $create_tables = !file_exists($db_name);
-                log_error("Weaave Storage created : DBname".$db_name." | username:".$username);
+                if ( ! file_exists($db_name) ) 
+                {
+                    report_error("The required sqllite database is not present! $db_name");
+                }
+
+                log_error("Starting SQLite connection");
                 $this->_dbh = new PDO('sqlite:' . $db_name);
                 $this->_dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            }
-            else if(MYSQL_ENABLE)
+            } 
+            else if ( MYSQL_ENABLE ) 
             {
-                log_error("MYSQL_ENABLE TRUE");
-                $this->_dbh = new PDO("mysql:host=".MYSQL_HOST.";dbname=".MYSQL_DB, MYSQL_USER, MYSQL_PASSWORD);
-                $select_stmt = "show tables like 'wbo'";
-                $sth = $this->_dbh->prepare($select_stmt);
-                $sth->execute();
-                $count = $sth->rowCount();
-                log_error("count".$count);
-                if(0 == $count)
-                {
-                    log_error("CREATE TABLE");
-                    $create_tables = true;
-                }
-                else
-                {
-                    $create_tables = false;
-                }
+                log_error("Starting MySQL connection");
+                $this->_dbh = new PDO("mysql:host=". MYSQL_HOST .";dbname=". MYSQL_DB, MYSQL_USER, MYSQL_PASSWORD);
             }
-        }
-        catch( PDOException $exception )
+
+        } 
+
+        catch( PDOException $exception ) 
         {
             log_error("database unavailable " . $exception->getMessage());
-            throw new Exception("Database unavailable", 503);
-        }
-        if ($create_tables)
-        { 
-            log_error("db create");
-            $this->setup_db();
+            throw new Exception("Database unavailable " . $exception->getMessage() , 503);
         }
 
     }
@@ -269,7 +259,7 @@ class WeaveStorage
         $params = array();
         $update_list = array();
 
-#make sure we have an id and collection. No point in continuing otherwise
+        #make sure we have an id and collection. No point in continuing otherwise
         if (!$wbo->id() || !$wbo->collection())
         {
             error_log('Trying to update without a valid id or collection!');
@@ -670,6 +660,7 @@ class WeaveStorage
     {
         return null;
     }
+
     function delete_storage($username)
     {
         log_error("delete storage");
@@ -693,6 +684,7 @@ class WeaveStorage
         return 1;
 
     }
+
     function delete_user($username)
     {
         log_error("delete User");
@@ -726,19 +718,6 @@ class WeaveStorage
     function create_user($username, $password)
     {
         log_error("Create User - Username: ".$username."|".$password);
-        /*try
-          {
-          $select_stmt = 'select username from users where username = :username';
-          $sth = $this->_dbh->prepare($select_stmt);
-          $username = $this->_username;
-          $sth->bindParam(':username', $username);
-          $sth->execute();
-          }
-          catch( PDOException $exception )
-          {
-          error_log("exists_user: " . $exception->getMessage());
-          throw new Exception("Database unavailable", 503);
-          }*/
 
         try
         {
@@ -779,7 +758,7 @@ class WeaveStorage
         return 1;
     }
 
-#function checks if user exists
+    #function checks if user exists
     function exists_user()
     {
         try
@@ -806,6 +785,7 @@ class WeaveStorage
 
     function authenticate_user($password)
     {
+        log_error("auth-user: " . $this->_username);
         try
         {
             $select_stmt = 'select username from users where username = :username and md5 = :md5';
@@ -830,81 +810,6 @@ class WeaveStorage
         return 1;
     }
 
-    function setup_db()
-    {
-
-        try
-        {
-            /*				$create_statement ="
-                            create table wbo
-                            (
-                            username text,
-                            id text,
-                            collection text,
-                            parentid text,
-                            predecessorid int,
-                            modified real,
-                            sortindex int,
-                            payload text,
-                            payload_size int,
-                            ttl int,
-                            primary key (username,collection,id)
-                            )";*/
-            $create_statement ="
-                create table wbo
-                (
-                 username varchar(100),
-                 id varchar(65),
-                 collection varchar(100),
-                 parentid  varchar(65),
-                 predecessorid int,
-                 modified real,
-                 sortindex int,
-                 payload text,
-                 payload_size int,
-                 ttl int,
-                 primary key (username,collection,id)
-                )";
-
-            /*				$create_statement2 = "
-                            create table users
-                            (
-                            username text,
-                            md5 text,
-                            primary key (username)
-                            )
-                            ";*/
-            $create_statement2 = "
-                create table users
-                (
-                 username varchar(255),
-                 md5 varchar(64),
-                 primary key (username)
-                )
-                ";
-
-            $index1 = 'create index parentindex on wbo (username, parentid)';
-            $index2 = 'create index predecessorindex on wbo (username, predecessorid)';
-            $index3 = 'create index modifiedindex on wbo (username, collection, modified)';
-
-
-            $sth = $this->_dbh->prepare($create_statement);
-            $sth->execute();
-            $sth = $this->_dbh->prepare($create_statement2);
-            $sth->execute();
-            $sth = $this->_dbh->prepare($index1);
-            $sth->execute();
-            $sth = $this->_dbh->prepare($index2);
-            $sth->execute();
-            $sth = $this->_dbh->prepare($index3);
-            $sth->execute();
-        }
-        catch( PDOException $exception )
-        {
-            log_error("initialize_user_db:" . $exception->getMessage());
-            throw new Exception("Database unavailable", 503);
-        }
-    }
 }
 
 
