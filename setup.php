@@ -36,17 +36,6 @@
 # 
 # ***** END LICENSE BLOCK *****
 
-/*
-
-TODO:
-! - add license information
-! - write settings.php
-! - add form to select if we should use sql-lite or mysql
-! - add form to store the mysql settings
-! - check if the setup is already done
-
-*/
-
 // --------------------------------------------
 // variables start
 // --------------------------------------------
