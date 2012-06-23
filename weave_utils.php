@@ -15,13 +15,19 @@
 	define ('WEAVE_ERROR_NO_EMAIL', 12);
 	define ('WEAVE_ERROR_INVALID_COLLECTION', 13);
 
-    function log_error($msg)
+
+    define ('LOG_THE_ERROR', 0);
+
+    function log_error($msg) 
     {   
-#        $datei = fopen("error.txt","a");
- #       fputs($datei,$msg."
-  #      ");
-        #fputs($datei,"Server ".print_r( $_SERVER, true));
-   #     fclose($datei);
+        if ( LOG_THE_ERROR == 1 ) 
+        {
+            $datei = fopen("/tmp/FSyncMS-error.txt","a");
+            $fmsg = sprintf("$msg\n");
+            fputs($datei,$fmsg);
+            fputs($datei,"Server ".print_r( $_SERVER, true));
+            fclose($datei);
+        }
     }
     
 	function report_problem($message, $code = 503)
@@ -118,7 +124,7 @@
 		$auth_pw = array_key_exists('PHP_AUTH_PW', $_SERVER) ? $_SERVER['PHP_AUTH_PW'] : null;
 
 		if (is_null($auth_user) || is_null($auth_pw)) 
-		{
+        {
 			/* CGI/FCGI auth workarounds */
 			$auth_str = null;
 			if (array_key_exists('Authorization', $_SERVER))
@@ -152,11 +158,11 @@
 			}
 		}
 
-		if (!$auth_user || !$auth_pw) #do this first to avoid the cryptic error message if auth is missing
+		if ( ! $auth_user || ! $auth_pw) #do this first to avoid the cryptic error message if auth is missing
 		{
-            log_error("Auth failed{");
-            log_error(" User pw:".$auth_user."|".$auth_pw);
-            log_error(" Url_user:".$url_user);
+            log_error("Auth failed 1 {");
+            log_error(" User pw: ". $auth_user ." | ". $auth_pw);
+            log_error(" Url_user: ". $url_user);
             log_error("}");
             report_problem('Authentication failed', '401');
 		}
@@ -169,11 +175,11 @@
 
 		try 
 		{
-			if (!$db->authenticate_user(fix_utf8_encoding($auth_pw)))
+			if ( ! $db->authenticate_user(fix_utf8_encoding($auth_pw)) )
             {
-                log_error("Auth failed{");
-                log_error(" User pw:".$auth_user."|".$auth_pw ."|md5:".md5($auth_pw)."|fix:".fix_utf8_encoding($auth_pw)."|fix md5". md5(fix_utf8_encoding($auth_pw)));
-                log_error(" Url_user:".$url_user);
+                log_error("Auth failed 2 {");
+                log_error(" User pw: ". $auth_user ."|".$auth_pw ."|md5:". md5($auth_pw) ."|fix:". fix_utf8_encoding($auth_pw) ."|fix md5 ". md5(fix_utf8_encoding($auth_pw)));
+                log_error(" Url_user: ".$url_user);
                 log_error("}");
 				report_problem('Authentication failed', '401');
             }
@@ -181,6 +187,7 @@
 		catch(Exception $e)
 		{
 			header("X-Weave-Backoff: 1800");
+			log_error($e->getMessage(), $e->getCode());
 			report_problem($e->getMessage(), $e->getCode());
 		}
 
