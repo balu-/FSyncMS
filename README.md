@@ -21,7 +21,8 @@ FSyncMS v011
 ======
 Added dedicated setup script, which will create the database and the config file: settings.php
 
-    ~~~~~~~~~ settings.php start ~~~~~~~~~~~~~~
+If you want to create it by your own, just generate the settings.php with the following content
+
     <?php
         //you can disable registration to the firefox sync server here,
         // by setting ENABLE_REGISTER to false
@@ -45,7 +46,6 @@ Added dedicated setup script, which will create the database and the config file
         define("MYSQL_PASSWORD", "databaseUserPW");
 
     ?>
-    ~~~~~~~~~ settings.php end ~~~~~~~~~~
 
 
 FSyncMS v010
