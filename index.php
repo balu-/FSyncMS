@@ -39,7 +39,7 @@
 # ***** END LICENSE BLOCK *****
 
     if ( ! file_exists("settings.php") && file_exists("setup.php") ) {
-        header( 'Location: setup.php' );
+        require_once "setup.php";
         exit;
 
     } else if ( ! file_exists("settings.php") ) {
