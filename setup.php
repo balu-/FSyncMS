@@ -213,7 +213,7 @@ function print_mysql_connection_form() {
         </tr>
         <tr>
             <td>Password</td>
-            <td><input type="text" name="dbpass" /></td>
+            <td><input type="password" name="dbpass" /></td>
         </tr>
     </table>
 
