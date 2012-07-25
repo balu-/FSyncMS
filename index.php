@@ -67,7 +67,18 @@
 		$path = $_SERVER['PATH_INFO'];
 	else if (!empty($_SERVER['ORIG_PATH_INFO']))
 		$path = $_SERVER['ORIG_PATH_INFO'];
-	else
+    else if (!empty($_SERVER["REQUEST_URI"]))
+    {
+        log_error("experimental path");
+        # this is kind of an experimental try, i needed it so i build it,
+        # but that doesent mean that it does work... well it works for me
+        # and it shouldnt break anything...
+        $path = $_SERVER["REQUEST_URI"];
+        $lastfolder = substr(FSYNCMS_ROOT,strrpos(FSYNCMS_ROOT, "/",-2));
+        $path = substr($path, (strpos($path,$lastfolder) + strlen($lastfolder)-1)); #chop the lead slash
+        log_error("path_exp:".$path);
+    } 
+    else
 		report_problem("No path found", 404);
     
 	$path = substr($path, 1); #chop the lead slash
