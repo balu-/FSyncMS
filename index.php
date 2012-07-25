@@ -76,6 +76,8 @@
         $path = $_SERVER["REQUEST_URI"];
         $lastfolder = substr(FSYNCMS_ROOT,strrpos(FSYNCMS_ROOT, "/",-2));
         $path = substr($path, (strpos($path,$lastfolder) + strlen($lastfolder)-1)); #chop the lead slash
+        if(strpos($path,'?') != false)
+            $path = substr($path, 0, strpos($path,'?')); //remove php arguments
         log_error("path_exp:".$path);
     } 
     else
