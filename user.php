@@ -15,17 +15,32 @@
         report_problem('Function not found', 404);
     }
     require_once "settings.php";
-    #Basic path extraction and validation. No point in going on if these are missing
+	// basic path extraction and validation. No point in going on if these are missing
 	$path = '/';
 	if (!empty($_SERVER['PATH_INFO']))
 		$path = $_SERVER['PATH_INFO'];
 	else if (!empty($_SERVER['ORIG_PATH_INFO']))
 		$path = $_SERVER['ORIG_PATH_INFO'];
+	else if (!empty($_SERVER["REQUEST_URI"]))
+	{
+		// improved path handling to prevent invalid server url error message in Firefox
+		log_error("experimental path");
+
+		// this is kind of an experimental try, i needed it so i build it,
+		// but that doesent mean that it does work... well it works for me
+		// and it shouldnt break anything...
+		$path = $_SERVER["REQUEST_URI"];
+		$lastfolder = substr(FSYNCMS_ROOT,strrpos(FSYNCMS_ROOT, "/",-2));
+		$path = substr($path, (strpos($path,$lastfolder) + strlen($lastfolder)-1));	// chop the lead slash
+		if(strpos($path,'?') != false)
+			$path = substr($path, 0, strpos($path,'?'));	// remove php arguments
+		log_error("path_exp:".$path);
+	}
 	else 
-    {
-        log_error("user.php: No path found");
-		report_problem("No path found", 404);
-    }
+	{
+        	log_error("user.php: No path found");
+			report_problem("No path found", 404);
+	}
 	$path = substr($path, 1); #chop the lead slash
 	list($preinstr, $version, $username, $function, $collection, $id) = explode('/', $path.'///');
     log_error("Pfad:".$path); 
