@@ -94,8 +94,11 @@
 		
 		if (strlen($collection) > 32)
 			return false;
-			
-		return preg_match('/[^A-Z0-9._-]/i', $collection) ? false : true;
+
+		// allow characters '?' and '=' in the collection string which e.g.
+		// appear if the following request is send from firefox:
+		// http://<server>/weave/1.1/<user>/storage/clients?full=1
+		return preg_match('/[^A-Z0-9?=._-]/i', $collection) ? false : true;
 	}
 	
     #user exitsts
