@@ -64,7 +64,7 @@ class WeaveStorage
 
                 if ( ! file_exists($db_name) ) 
                 {
-                    report_error("The required sqllite database is not present! $db_name");
+                    log_error("The required sqllite database is not present! $db_name");
                 }
 
                 log_error("Starting SQLite connection");
