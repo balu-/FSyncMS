@@ -88,7 +88,9 @@
     // ensure that we got a valid request
     if ( !$path ) 
         report_problem("Invalid request, this was not a firefox sync request!", 400);
-    list($version, $username, $function, $collection, $id) = explode('/', $path.'///');
+
+    // split path into parts and make sure that all values are properly initialized
+    list($version, $username, $function, $collection, $id) = array_pad(explode('/', $path.'///'), 5, '');
     
     if($version == 'user' || $version == 'misc')
     {
