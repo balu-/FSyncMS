@@ -42,7 +42,9 @@
 			report_problem("No path found", 404);
 	}
 	$path = substr($path, 1); #chop the lead slash
-	list($preinstr, $version, $username, $function, $collection, $id) = explode('/', $path.'///');
+	// split path into parts and make sure that all values are properly initialized
+	list($preinstr, $version, $username, $function, $collection, $id) = array_pad(explode('/', $path.'///'), 6, '');
+
     log_error("Pfad:".$path); 
     if( $preinstr != 'user' && $preinstr != 'misc' )
         report_problem('Function not found', 404);
