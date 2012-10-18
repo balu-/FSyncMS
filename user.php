@@ -89,8 +89,16 @@
                 if(strpos($_SERVER['REQUEST_URI'],'index.php') !== 0)
                     $index .= "index.php/";
                 */
-                exit(FSYNCMS_ROOT);
-                    
+
+                // modification to support iPhone/iPod Touch devices
+                // check http://www.rfkd.de/?p=974 for further details
+                if (isset($_SERVER['HTTPS'])) {
+                    exit("https://" . parse_url(FSYNCMS_ROOT, PHP_URL_HOST) . parse_url(FSYNCMS_ROOT, PHP_URL_PATH));
+                } else {
+                    // allow http requests because use of self-signed certificates
+                    // on iPhone/iPod Touch devices doesn't work
+                    exit("http://"  . parse_url(FSYNCMS_ROOT, PHP_URL_HOST) . parse_url(FSYNCMS_ROOT, PHP_URL_PATH));
+                }
             }
             else if($function == 'password_reset')
             {
