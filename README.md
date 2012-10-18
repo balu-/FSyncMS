@@ -2,7 +2,7 @@ FSyncMS
 =======
 
 PHP Sync Server für Firefox Sync
-Eine erweiterung des Weave-Minimal Server (dessen Support leider eingestellt wurde).
+Eine Erweiterung des Weave-Minimal Server (dessen Support leider eingestellt wurde).
 
 Die derzeit aktuelle Versionen,
 sowie alte Versionen und Anleitungen sind hier:
