@@ -102,17 +102,6 @@
 
     header("Content-type: application/json"); 
     
-    // modification to support iPhone/iPod Touch devices
-    // check http://www.rfkd.de/?p=974 for further details
-    $url_parts = parse_url(FSYNCMS_ROOT);
-    if ($version == 'user' && $collection == 'node' && $id == 'weave') {
-        if (isset($_SERVER['HTTPS'])) {
-            exit("https://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . $url_parts[path]);
-        } else {
-            exit("http://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . $url_parts[path]);
-        }
-    }
-
 	if ($version != '1.0' && $version != '1.1')
 		report_problem('Function not found', 404);
 
