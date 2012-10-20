@@ -17,6 +17,11 @@ Stay tuned.
 Visit http://www.ohnekontur.de/2011/07/24/how-to-install-fsyncms-firefox-sync-eigener-server/ for install instructions
 Visit http://www.ohnekontur.de for the newest version
 
+
+FSyncMS v012
+======
+Compatibility update 
+
 FSyncMS v011
 ======
 Added dedicated setup script, which will create the database and the config file: settings.php
