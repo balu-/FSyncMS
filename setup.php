@@ -146,7 +146,7 @@ function write_config_file($dbt, $dbh, $dbn, $dbu, $dbp) {
 
     $cfg_content .= "    // Database connection credentials\n";
     $cfg_content .= "    // \n";
-
+    $cfg_content .= "    define(\"SQLITE_FILE\", \"weave_db\");\n";
     if ( $dbt != "mysql" ) {
         $cfg_content .= "    define(\"MYSQL_ENABLE\", false);\n";
         $cfg_content .= "    define(\"MYSQL_HOST\", \"localhost\");\n";
@@ -229,7 +229,7 @@ function print_mysql_connection_form() {
 // check if we have no configuration at the moment
 //
 if ( file_exists("settings.php") && filesize( "settings.php" ) > 0 ) {
-    echo "<hr><h2>The setup looks like it's completed, else please delete settings.php</h2><hr>";
+    echo "<hr><h2>The setup looks like it's completed, please delete settings.php</h2><hr>";
     exit;
 }
 
@@ -319,8 +319,7 @@ if ( $action == "step2" ) {
             if ( file_exists($db_name) && filesize( $db_name ) > 0 ) {
                 $dbInstalled = true;
             } else {
-                // echo("Creating sqlite weave storage: DBname". $db_name ." | username: ". $username);
-                // echo("<br>");
+                echo("Creating sqlite weave storage: ". $db_name ."<br>");
                 $dbHandle = new PDO('sqlite:' . $db_name);
                 $dbHandle->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             }
