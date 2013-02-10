@@ -104,7 +104,7 @@ function check_input( $data ) {
     create the config file with the database type
     and the given connection credentials
 */
-function write_config_file($dbt, $dbh, $dbn, $dbu, $dbp) {
+function write_config_file($dbt, $dbh, $dbn, $dbu, $dbp, $fsRoot) {
 
     // construct the name of config file
     //
@@ -119,17 +119,6 @@ function write_config_file($dbt, $dbh, $dbn, $dbu, $dbp) {
     }
 
     echo "Creating cfg file: " . $cfg_file_name;
-
-    // get the FSYNC_ROOT url
-    //
-    $fsRoot ="https://";
-    if ( ! isset($_SERVER['HTTPS']) ) {
-        $fsRoot = "http://";
-    }
-    $fsRoot .= $_SERVER['SERVER_NAME'] . dirname($_SERVER['SCRIPT_NAME']) . "/";
-    if( strpos( $_SERVER['REQUEST_URI'], 'index.php') !== 0 ) {
-        $fsRoot .= "index.php/";
-    }
 
     // now build the content of the config file
     //
@@ -351,7 +340,7 @@ if ( $action == "step2" ) {
         try {
             $create_statement = " create table wbo ( username varchar(100), id varchar(65), collection varchar(100),
                  parentid  varchar(65), predecessorid int, modified real, sortindex int,
-                 payload text, payload_size int, ttl int, primary key (username,collection,id))";
+                 payload text, payload_size int, ttl int, primary key (username,collection,id)/)";
             $create_statement2 = " create table users ( username varchar(255), md5 varchar(64), primary key (username)) ";
             $index1 = 'create index parentindex on wbo (username, parentid)';
             $index2 = 'create index predecessorindex on wbo (username, predecessorid)';
@@ -375,15 +364,30 @@ if ( $action == "step2" ) {
 
     }
 
+    //guessing fsroot
+      // get the FSYNC_ROOT url
+    //  
+    $fsRoot ="https://";
+    if ( ! isset($_SERVER['HTTPS']) ) { 
+        $fsRoot = "http://";
+    }   
+    $fsRoot .= $_SERVER['SERVER_NAME'] . dirname($_SERVER['SCRIPT_NAME']) . "/";
+    if( strpos( $_SERVER['REQUEST_URI'], 'index.php') !== 0 ) { 
+        $fsRoot .= "index.php/";
+    }   
+
     // write settings.php, if not possible, display the needed contant
     //
-    write_config_file($dbType, $dbHost, $dbName, $dbUser, $dbPass);
+    write_config_file($dbType, $dbHost, $dbName, $dbUser, $dbPass, $fsRoot);
 
     echo "<hr><hr> Finished the setup, please delete setup.php and go on with the FFSync<hr><hr>";
-
+    echo <<<EOT
+        <hr><hr>                                                                                                            
+         <h4>This script has guessed the Address of your installation, this might not be accurate,<br/>
+         Please check if this script can be reached by <a href="$fsRoot">$fsRoot</a> .<br/>
+         If thats not the case you have to ajust the settings.php<br />
+         </h4>
+EOT;
 }
-
-
-
 
 ?>
