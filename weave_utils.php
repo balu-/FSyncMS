@@ -19,6 +19,7 @@
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
+#   Daniel Triendl <daniel@pew.cc>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -212,13 +213,21 @@
 
 		try 
 		{
-			if ( ! $db->authenticate_user(fix_utf8_encoding($auth_pw)) )
+			$existingHash = $db->get_password_hash();
+			$hash = WeaveHashFactory::factory();
+			
+			if ( ! $hash->verify(fix_utf8_encoding($auth_pw), $existingHash) )
             {
                 log_error("Auth failed 2 {");
                 log_error(" User pw: ". $auth_user ."|".$auth_pw ."|md5:". md5($auth_pw) ."|fix:". fix_utf8_encoding($auth_pw) ."|fix md5 ". md5(fix_utf8_encoding($auth_pw)));
                 log_error(" Url_user: ".$url_user);
+                log_error(" Existing hash: ".$existingHash);
                 log_error("}");
 				report_problem('Authentication failed', '401');
+            } else {
+            	if ( $hash->needsUpdate($existingHash) ) {
+            		$db->change_password($hash->hash(fix_utf8_encoding($auth_pw)));
+            	}
             }
 		}
 		catch(Exception $e)

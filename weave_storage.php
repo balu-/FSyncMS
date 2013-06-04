@@ -22,6 +22,7 @@
 #
 # Contributor(s):
 #	Toby Elliott (telliott@mozilla.com)
+#   Daniel Triendl <daniel@pew.cc>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -725,7 +726,8 @@ class WeaveStorage
             $create_statement = "insert into users values (:username, :md5)";
 
             $sth = $this->_dbh->prepare($create_statement);
-            $password = md5($password);
+            $hash = WeaveHashFactory::factory();
+            $password = $hash->hash($password);
             $sth->bindParam(':username', $username);
             $sth->bindParam(':md5', $password);
             $sth->execute();
@@ -739,16 +741,15 @@ class WeaveStorage
         return 1;
     }
 
-    function change_password($username, $password)
+    function change_password($hash)
     {
         try
         {
             $update_statement = "update users set md5 = :md5 where username = :username";
 
             $sth = $this->_dbh->prepare($update_statement);
-            $password = md5($password);
-            $sth->bindParam(':username', $username);
-            $sth->bindParam(':md5', $password);
+            $sth->bindParam(':username', $this->_username);
+            $sth->bindParam(':md5', $hash);
             $sth->execute();
         }
         catch( PDOException $exception )
@@ -784,31 +785,27 @@ class WeaveStorage
     }
 
 
-    function authenticate_user($password)
+    function get_password_hash()
     {
         log_error("auth-user: " . $this->_username);
         try
         {
-            $select_stmt = 'select username from users where username = :username and md5 = :md5';
+            $select_stmt = 'select md5 from users where username = :username';
             $sth = $this->_dbh->prepare($select_stmt);
             $username = $this->_username;
-            $password = md5($password);
             $sth->bindParam(':username', $username);
-            $sth->bindParam(':md5', $password);
             $sth->execute();
         }
         catch( PDOException $exception )
         {
-            error_log("authenticate_user: " . $exception->getMessage());
+            error_log("get_password_hash: " . $exception->getMessage());
             throw new Exception("Database unavailable", 503);
         }
 
-        if (!$result = $sth->fetch(PDO::FETCH_ASSOC))
-        {
-            return null;
-        }
-
-        return 1;
+        $result = $sth->fetchColumn();
+        if ($result === FALSE) $result = "";
+        
+        return $result; 
     }
 
 }

@@ -54,6 +54,7 @@
 	require_once 'weave_storage.php';
 	require_once 'weave_basic_object.php';
 	require_once 'weave_utils.php';
+	require_once 'weave_hash.php';
 
     require_once "WBOJsonOutput.php";
 	//header("Content-type: application/json");
