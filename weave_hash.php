@@ -180,7 +180,7 @@ class WeaveHashBCrypt implements  WeaveHash {
 
 class WeaveHashFactory {
 	public static function factory() {
-		if (BCRYPT) {
+		if (defined("BCRYPT") && BCRYPT) {
 			return new WeaveHashBCrypt(BCRYPT_ROUNDS);
 		} else {
 			return new WeaveHashMD5();
