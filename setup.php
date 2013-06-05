@@ -21,6 +21,7 @@
 # the Initial Developer. All Rights Reserved.
 # 
 # Contributor(s):
+#   Daniel Triendl <daniel@pew.cc>
 # 
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -149,6 +150,10 @@ function write_config_file($dbt, $dbh, $dbn, $dbu, $dbp, $fsRoot) {
         $cfg_content .= "    define(\"MYSQL_USER\", \"$dbu\");\n";
         $cfg_content .= "    define(\"MYSQL_PASSWORD\", \"$dbp\");\n";
     }
+    $cfg_content .= "\n";
+    $cfg_content .= "    // Use bcrypt instead of MD5 for password hashing\n";
+    $cfg_content .= "    define(\"BCRYPT\", true);\n";
+    $cfg_content .= "    define(\"BCRYPT_ROUNDS\", 12);\n";
 
     $cfg_content .= "\n?>\n";
 
