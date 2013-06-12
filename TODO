@@ -4,3 +4,4 @@
 
 
 - NOTIZ: Update der md5 Spalte der Usertabelle von length 64 auf length 124
+- >ALTER TABLE `users` CHANGE `md5` `md5` VARCHAR( 124 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL 
