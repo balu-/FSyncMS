@@ -22,6 +22,7 @@
 #
 # Contributor(s):
 #	Toby Elliott (telliott@mozilla.com)
+#   balu
 #   Daniel Triendl <daniel@pew.cc>
 #
 # Alternatively, the contents of this file may be used under the terms of
