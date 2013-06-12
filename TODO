@@ -1,3 +1,6 @@
 == SOME TODOS ==
 
 - Ein Präfix für die Tabellen, damit sie in eine vorhandene DB gelegt werden können.
+
+
+- NOTIZ: Update der md5 Spalte der Usertabelle von length 64 auf length 124
