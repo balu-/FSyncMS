@@ -18,6 +18,13 @@ Visit http://www.ohnekontur.de/2011/07/24/how-to-install-fsyncms-firefox-sync-ei
 Visit http://www.ohnekontur.de for the newest version
 
 
+FSyncMS v013
+======
+Database upgrade
+for more information and some migration notice see
+http://www.ohnekontur.de/2013/07/05/fsyncms-version-0-13-database-upgrade/
+
+
 FSyncMS v012
 ======
 Compatibility update 
