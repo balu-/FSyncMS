@@ -244,7 +244,8 @@
                    log_error("user.php: POST password ");
                   //to do
                   // change pw in db
-                  if($db->change_password($new_pwd))
+                  $hash = WeaveHashFactory::factory();
+                  if($db->change_password($hash->hash($new_pwd)))
                     exit("success"); 
                   else
                     report_problem(WEAVE_ERROR_INVALID_PROTOCOL, 503); //server db messed up somehow
