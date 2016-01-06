@@ -220,8 +220,12 @@ class WeaveStorage
 
         try
         {
-            $insert_stmt = 'replace into wbo (username, id, collection, parentid, predecessorid, sortindex, modified, payload, payload_size)
-                values (:username, :id, :collection, :parentid, :predecessorid, :sortindex, :modified, :payload, :payload_size)';
+            $insert_stmt = 'insert into wbo (username, id, collection, parentid, predecessorid, sortindex, modified, payload, payload_size) 
+                            values (:username, :id, :collection, :parentid, :predecessorid, :sortindex, :modified, :payload, :payload_size) 
+                            on duplicate key update 
+                            username=values(username), id=values(id), collection=values(collection), parentid=values(parentid), 
+                            predecessorid=values(predecessorid), sortindex=values(sortindex), modified=values(modified), payload=values(payload), 
+                            payload_size=values(payload_size)';
             $sth = $this->_dbh->prepare($insert_stmt);
 
             $username = $this->_username;
