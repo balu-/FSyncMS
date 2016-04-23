@@ -24,6 +24,7 @@
 #	Toby Elliott (telliott@mozilla.com)
 #   balu
 #   Daniel Triendl <daniel@pew.cc>
+#   Mark Straver <moonchild@palemoon.org>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -220,12 +221,21 @@ class WeaveStorage
 
         try
         {
-            $insert_stmt = 'insert into wbo (username, id, collection, parentid, predecessorid, sortindex, modified, payload, payload_size) 
-                            values (:username, :id, :collection, :parentid, :predecessorid, :sortindex, :modified, :payload, :payload_size) 
-                            on duplicate key update 
-                            username=values(username), id=values(id), collection=values(collection), parentid=values(parentid), 
-                            predecessorid=values(predecessorid), sortindex=values(sortindex), modified=values(modified), payload=values(payload), 
-                            payload_size=values(payload_size)';
+            if ( MYSQL_ENABLE )
+            { 
+                $insert_stmt = 'insert into wbo (username, id, collection, parentid, predecessorid, sortindex, modified, payload, payload_size) 
+                                values (:username, :id, :collection, :parentid, :predecessorid, :sortindex, :modified, :payload, :payload_size) 
+                                on duplicate key update 
+                                username=values(username), id=values(id), collection=values(collection), parentid=values(parentid), 
+                                predecessorid=values(predecessorid), sortindex=values(sortindex), modified=values(modified), payload=values(payload), 
+                                payload_size=values(payload_size)';
+            } 
+            else 
+            {
+                $insert_stmt = 'replace into wbo (username, id, collection, parentid, predecessorid, sortindex, modified, payload, payload_size)
+                                values (:username, :id, :collection, :parentid, :predecessorid, :sortindex, :modified, :payload, :payload_size)';
+            }
+            
             $sth = $this->_dbh->prepare($insert_stmt);
 
             $username = $this->_username;
